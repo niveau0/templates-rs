@@ -1,0 +1,29 @@
+[package]
+name = "{{crate_name}}"
+version = "0.1.0"
+authors = ["{{authors}}"]
+edition = "2018"
+description = "{{project-name}}, a command line example application"
+license = "{{license}}"
+
+[profile.release]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+[dependencies]
+{% if crate_type == "bin" %}
+clap = "3.1" # parse command line options
+{% endif %}
+config = "0.12" # parse config file
+env_logger = "0.9" # log implementation
+log = "0.4" # logging facade
+thiserror = "1"
+
+
+{% if crate_type == "bin" %}
+[[bin]]
+path = "src/main.rs"
+name = "{{crate_name}}-cli"
+{% endif %}

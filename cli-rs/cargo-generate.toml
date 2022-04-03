@@ -1,0 +1,5 @@
+[placeholders.license]
+type = "string"
+prompt = "What license to use?"
+choices = ["MIT", "Apache license 2.0"]
+default = "MIT"
