@@ -6,7 +6,7 @@ pub struct CliConfig {
     pub example: String,
 }
 
-pub fn read_config<'a>(maybe_filename: &Option<&str>) -> Result<CliConfig, error::Error> {
+pub fn read_config(maybe_filename: &Option<&str>) -> Result<CliConfig, error::Error> {
     let settings = read_merged_config(maybe_filename).map_err(|_| error::Error::ReadConfigError)?;
     let example = settings
         .get_string("example")
@@ -19,17 +19,17 @@ pub fn read_merged_config(maybe_filename: &Option<&str>) -> Result<config::Confi
 
     settings = settings.add_source(File::new("conf/defaults", FileFormat::Yaml));
 
-    settings = match maybe_filename {
-        &Some(filename) => {
+    settings = match *maybe_filename {
+        Some(filename) => {
             if !Path::new(filename).exists() {
                 return Err(error::Error::ConfigFileDoesNotExistError(
                     filename.to_owned(),
                 ));
             } else {
-                settings.add_source(File::new(&filename, FileFormat::Yaml))
+                settings.add_source(File::new(filename, FileFormat::Yaml))
             }
         }
-        &None => settings,
+        None => settings,
     };
     settings = settings.add_source(config::Environment::with_prefix("app"));
 
