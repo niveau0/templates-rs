@@ -29,10 +29,7 @@ fn main() {
 ///
 /// * `config` - configuration
 fn configure_commands() -> Vec<impl Command> {
-    let mut commands = Vec::new();
-
-    commands.push(ctx_example::example_command());
-    commands
+    vec![ctx_example::example_command()]
 }
 
 fn init_log(matches: &ArgMatches) {
@@ -47,7 +44,7 @@ fn init_log(matches: &ArgMatches) {
     let loglevel = match matches.value_of("module") {
         Some(module) => {
             let mut module_loglevel = String::from(module);
-            module_loglevel.push_str("=");
+            module_loglevel.push('=');
             module_loglevel.push_str(loglevel);
             module_loglevel
         }
@@ -59,7 +56,7 @@ fn init_log(matches: &ArgMatches) {
     debug!("Setting log level to {}", &loglevel);
 }
 
-fn parse_cli(commands: &Vec<impl Command>) -> clap::ArgMatches {
+fn parse_cli(commands: &[impl Command]) -> clap::ArgMatches {
     let parser = clap::Command::new("{{crate_name}}")
         .version({{crate_name}}::version())
         .author({{crate_name}}::authors())
@@ -82,7 +79,7 @@ fn parse_cli(commands: &Vec<impl Command>) -> clap::ArgMatches {
             .help("Level of verbosity (error is default) if used multiple times: warn(v), info(vv), debug(vvv) and trace(vvvv)"));
 
     commands
-        .into_iter()
+        .iter()
         .fold(parser, |parser, cmd| parser.subcommand(cmd.cli()))
         .get_matches()
 }
