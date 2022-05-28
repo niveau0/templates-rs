@@ -2,7 +2,7 @@
 name = "{{crate_name}}"
 version = "0.1.0"
 authors = ["{{authors}}"]
-edition = "2018"
+edition = "2021"
 description = "{{project-name}}, a command line example application"
 license = "{{license}}"
 
@@ -19,7 +19,12 @@ clap = "3.1" # parse command line options
 config = "0.12" # parse config file
 env_logger = "0.9" # log implementation
 log = "0.4" # logging facade
-thiserror = "1"
+thiserror = "1" # error support
+{% if async == "tokio" %}
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] } # async runtime
+{% else if async == "async_std" %}
+async-std = { version = "1", features = ["attributes"] } # async runtime
+{% endif %}
 
 
 {% if crate_type == "bin" %}

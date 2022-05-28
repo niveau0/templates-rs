@@ -3,3 +3,9 @@ type = "string"
 prompt = "What license to use?"
 choices = ["MIT", "Apache license 2.0"]
 default = "MIT"
+
+[placeholders.async]
+type = "string"
+prompt = "Use async runtime?"
+choices = ["none", "tokio", "async_std"]
+default = "none"

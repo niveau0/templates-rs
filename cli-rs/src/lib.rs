@@ -17,7 +17,11 @@ pub fn authors() -> &'static str {
     AUTHORS
 }
 
+{% if async != "none" %}
+pub async fn run() -> Result<(), error::Error> {
+{% else %}
 pub fn run() -> Result<(), error::Error> {
+{% endif %}
     let commands = configure_commands();
     let arg_matches = parse_cli(&commands);
     init_log(&arg_matches);
