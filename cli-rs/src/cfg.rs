@@ -2,16 +2,17 @@ use crate::error;
 use config::{self, File, FileFormat};
 use std::path::Path;
 
-pub struct CliConfig {
+#[derive(Default)]
+pub struct ApplicationConfiguration {
     pub example: String,
 }
 
-pub fn read_config(maybe_filename: &Option<&str>) -> Result<CliConfig, error::Error> {
+pub fn read_config(maybe_filename: &Option<&str>) -> Result<ApplicationConfiguration, error::Error> {
     let settings = read_merged_config(maybe_filename).map_err(|_| error::Error::ReadConfigError)?;
     let example = settings
         .get_string("example")
         .map_err(|_| error::Error::ParseConfigError("Missing key example".to_owned()))?;
-    Ok(CliConfig { example })
+    Ok(ApplicationConfiguration { example })
 }
 
 pub fn read_merged_config(maybe_filename: &Option<&str>) -> Result<config::Config, error::Error> {

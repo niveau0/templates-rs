@@ -25,5 +25,5 @@ thiserror = "1"
 {% if crate_type == "bin" %}
 [[bin]]
 path = "src/main.rs"
-name = "{{crate_name}}-cli"
+name = "{{crate_name}}"
 {% endif %}

@@ -1,9 +1,7 @@
-use crate::{cfg::CliConfig, error};
-
-pub type CommandRunner = fn(&CliConfig, &clap::ArgMatches) -> Result<(), error::Error>;
+use crate::{cfg, error};
 
 pub trait Command {
-    fn matches(&self, args: &clap::ArgMatches) -> Option<CommandRunner>;
+    fn execute_on_match(&self, config: &cfg::ApplicationConfiguration, args: &clap::ArgMatches) -> Option<Result<(), error::Error>>;
 
-    fn cli(&self) -> clap::Command<'static>;
+    fn configuration(&self) -> clap::Command<'static>;
 }

@@ -1,7 +1,8 @@
-mod example;
+mod first;
+mod second;
 
 use crate::command::Command;
 
-pub fn example_command() -> impl Command {
-    example::Example::new()
+pub fn commands() -> Vec<Box<dyn Command>> {
+    vec![Box::new(first::First::new()), Box::new(second::Second::new())]
 }
