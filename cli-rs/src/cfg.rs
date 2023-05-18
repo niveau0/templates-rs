@@ -1,21 +1,31 @@
-use crate::error;
 use config::{self, File, FileFormat};
 use std::path::Path;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ConfigError {
+    #[error("Failed to load config.")]
+    ReadConfig,
+    #[error("Configuration file {0} does not exist")]
+    ConfigFileDoesNotExist(String),
+    #[error("Failed to parse config. {0}")]
+    ParseConfig(String),
+}
 
 #[derive(Default)]
-pub struct ApplicationConfiguration {
+pub struct Settings {
     pub example: String,
 }
 
-pub fn read_config(maybe_filename: &Option<&str>) -> Result<ApplicationConfiguration, error::Error> {
-    let settings = read_merged_config(maybe_filename).map_err(|_| error::Error::ReadConfigError)?;
+pub fn read_config(maybe_filename: &Option<&str>) -> Result<Settings, ConfigError> {
+    let settings = read_merged_config(maybe_filename).map_err(|_| ConfigError::ReadConfig)?;
     let example = settings
         .get_string("example")
-        .map_err(|_| error::Error::ParseConfigError("Missing key example".to_owned()))?;
-    Ok(ApplicationConfiguration { example })
+        .map_err(|_| ConfigError::ParseConfig("Missing key example".to_owned()))?;
+    Ok(Settings { example })
 }
 
-pub fn read_merged_config(maybe_filename: &Option<&str>) -> Result<config::Config, error::Error> {
+pub fn read_merged_config(maybe_filename: &Option<&str>) -> Result<config::Config, ConfigError> {
     let mut settings = config::Config::builder();
 
     settings = settings.add_source(File::new("conf/defaults", FileFormat::Yaml));
@@ -23,9 +33,7 @@ pub fn read_merged_config(maybe_filename: &Option<&str>) -> Result<config::Confi
     settings = match *maybe_filename {
         Some(filename) => {
             if !Path::new(filename).exists() {
-                return Err(error::Error::ConfigFileDoesNotExistError(
-                    filename.to_owned(),
-                ));
+                return Err(ConfigError::ConfigFileDoesNotExist(filename.to_owned()));
             } else {
                 settings.add_source(File::new(filename, FileFormat::Yaml))
             }

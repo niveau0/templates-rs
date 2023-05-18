@@ -1,3 +1,8 @@
+[hooks]
+#init = [...]
+pre = ["pre-script.rhai"]
+#post = [...]
+
 [placeholders.license]
 type = "string"
 prompt = "What license to use?"
@@ -9,3 +14,8 @@ type = "string"
 prompt = "Use async runtime?"
 choices = ["none", "tokio", "async_std"]
 default = "none"
+
+[placeholders.cmds]
+type = "bool"
+prompt = "Use commands as parameters?"
+default = false

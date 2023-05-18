@@ -12,10 +12,12 @@ To generate a project from a given template use cargo-generate. See command for 
 
         cargo generate -g niveau0/templates-rs cli-rs
 
+## Features
+
+* create template with async, using tokio or async_std runtime, or sync code skeleton.
 
 ## Planned
 
-* extend templates with async/sync switch for multiple async runtimes
 * web service skeleton with a REST API
     * optional WASM UI with tailwind css and trunk for bundling
     * optional DB connection

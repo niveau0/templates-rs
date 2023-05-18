@@ -1,13 +1,23 @@
 mod cfg;
 mod command;
 mod constants;
-mod ctx_example;
-mod error;
+mod ctx_{{context}};
 
 use crate::constants::AUTHORS;
 use crate::constants::VERSION;
 use clap::{Arg, ArgMatches};
 use command::Command;
+use std::ops::Deref;
+use std::sync::Arc;
+{%- if async == "tokio" %}
+use tokio::sync::RwLock;
+{%- endif %}
+{%- if async == "async_std" %}
+use async_std::sync::RwLock;
+{%- endif %}
+{%- if async == "none" %}
+use std::sync::RwLock;
+{%- endif %}
 
 pub fn version() -> &'static str {
     VERSION
@@ -17,20 +27,56 @@ pub fn authors() -> &'static str {
     AUTHORS
 }
 
-{% if async != "none" %}
-pub async fn run() -> Result<(), error::Error> {
-{% else %}
-pub fn run() -> Result<(), error::Error> {
-{% endif %}
+pub struct Shared<T> {
+    inner: Arc<RwLock<T>>,
+}
+
+impl<T> Clone for Shared<T> {
+    fn clone(&self) -> Self {
+        Self {
+            inner: self.inner.clone(),
+        }
+    }
+}
+
+impl<T> Deref for Shared<T> {
+    type Target = Arc<RwLock<T>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<T> From<T> for Shared<T> {
+    fn from(value: T) -> Self {
+        Shared {
+            inner: Arc::new(RwLock::new(value)),
+        }
+    }
+}
+
+{%- if async != "none" %}
+pub async fn run() -> Result<(), String> {
+{%- else %}
+pub fn run() -> Result<(), String> {
+{%- endif %}
     let commands = configure_commands();
     let arg_matches = parse_cli(&commands);
     init_log(&arg_matches);
 
     let maybe_filename = arg_matches.value_of("config");
-    let config = cfg::read_config(&maybe_filename).unwrap();
+    let settings = Shared::from(cfg::read_config(&maybe_filename).unwrap());
 
-    commands.iter().find_map(|cmd| cmd.execute_on_match(&config, &arg_matches))
-        .expect("Unexpected error: command not found")
+    for cmd in commands.iter() {
+{%- if async != "none" %}
+        if let Some(result) = cmd.execute_on_match(settings.clone(), &arg_matches).await {
+{%- else %}
+        if let Some(result) = cmd.execute_on_match(settings.clone(), &arg_matches) {
+{%- endif %}
+            return result.map_err(|e| e.to_string());
+        }
+    }
+    Err("Unexpected error: command not found".to_owned())
 }
 
 
@@ -42,7 +88,7 @@ pub fn run() -> Result<(), error::Error> {
 fn configure_commands() -> Vec<Box<dyn Command>> {
     let mut commands = vec![];
 
-    ctx_example::commands().into_iter().for_each(|v| commands.push(v));
+    ctx_{{context}}::commands().into_iter().for_each(|v| commands.push(v));
     commands
 }
 
