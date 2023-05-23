@@ -1,7 +1,7 @@
 use crate::cfg::Settings;
 use crate::command::{Command, CommandError};
 use crate::Shared;
-{%- if async != "none" %}
+{%- if runtime != "none" %}
 use async_trait::async_trait;
 {%- endif %}
 use clap::ArgMatches;
@@ -21,17 +21,17 @@ impl {{Cmd}} {
 
 fn run_cmd(_settings: Shared<Settings>, _args: &ArgMatches) -> Result<(), CommandError> {
     println!("{{cmd}} command executed");
-    Ok(())
+    Err(CommandError::Command("Example failure".to_owned()))
 }
 
 {%- if subcmd != "none" %}
 fn run_subcmd(_csettings: Shared<Settings>, _args: &ArgMatches) -> Result<(), CommandError> {
     println!("{{subcmd}} subcommand execution");
-    Err(CommandError::Command("Example failure".to_owned()))
+    Ok(())
 }
 {%- endif %}
 
-{%- if async != "none" %}
+{%- if runtime != "none" %}
 #[async_trait]
 impl Command for {{Cmd}} {
     async fn execute_on_match(
@@ -59,7 +59,7 @@ impl Command for {{Cmd}} {
 {%- endif %}
     }
 
-    fn configuration(&self) -> clap::Command<'static> {
+    fn configuration(&self) -> clap::Command {
         clap::Command::new(CMD) // cli command name
             .arg(
                 clap::Arg::new("first")

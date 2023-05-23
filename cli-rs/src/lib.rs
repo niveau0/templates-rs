@@ -9,13 +9,13 @@ use clap::{Arg, ArgMatches};
 use command::Command;
 use std::ops::Deref;
 use std::sync::Arc;
-{%- if async == "tokio" %}
+{%- if runtime == "tokio" %}
 use tokio::sync::RwLock;
 {%- endif %}
-{%- if async == "async_std" %}
+{%- if runtime == "async_std" %}
 use async_std::sync::RwLock;
 {%- endif %}
-{%- if async == "none" %}
+{%- if runtime == "none" %}
 use std::sync::RwLock;
 {%- endif %}
 
@@ -55,7 +55,7 @@ impl<T> From<T> for Shared<T> {
     }
 }
 
-{%- if async != "none" %}
+{%- if runtime != "none" %}
 pub async fn run() -> Result<(), String> {
 {%- else %}
 pub fn run() -> Result<(), String> {
@@ -64,11 +64,11 @@ pub fn run() -> Result<(), String> {
     let arg_matches = parse_cli(&commands);
     init_log(&arg_matches);
 
-    let maybe_filename = arg_matches.value_of("config");
+    let maybe_filename = arg_matches.get_one::<String>("config");
     let settings = Shared::from(cfg::read_config(&maybe_filename).unwrap());
 
     for cmd in commands.iter() {
-{%- if async != "none" %}
+{%- if runtime != "none" %}
         if let Some(result) = cmd.execute_on_match(settings.clone(), &arg_matches).await {
 {%- else %}
         if let Some(result) = cmd.execute_on_match(settings.clone(), &arg_matches) {
@@ -78,7 +78,6 @@ pub fn run() -> Result<(), String> {
     }
     Err("Unexpected error: command not found".to_owned())
 }
-
 
 /// Configure command instances and provide a map from command identifier to command instance.
 ///
@@ -93,7 +92,7 @@ fn configure_commands() -> Vec<Box<dyn Command>> {
 }
 
 fn init_log(matches: &ArgMatches) {
-    let loglevel = match matches.occurrences_of("v") {
+    let loglevel = match matches.get_one::<u8>("v").unwrap_or(&0) {
         0 => "error",
         1 => "warn",
         2 => "info",
@@ -101,7 +100,7 @@ fn init_log(matches: &ArgMatches) {
         _ => "trace",
     };
 
-    let loglevel = match matches.value_of("module") {
+    let loglevel = match matches.get_one::<String>("module") {
         Some(module) => {
             let mut module_loglevel = String::from(module);
             module_loglevel.push('=');
@@ -126,16 +125,16 @@ fn parse_cli(commands: &[Box<dyn Command>]) -> clap::ArgMatches {
             .short('c')
             .long("config")
             .value_name("FILE")
-            .help("Sets the configuration file name")
-            .takes_value(true))
+            .num_args(1)
+            .help("Sets the configuration file name"))
         .arg(Arg::new("module")
             .short('m')
             .long("module")
-            .takes_value(true)
+            .num_args(1)
             .help("Sets the optional name of the module for which to set the verbosity level"))
         .arg(Arg::new("v")
             .short('v')
-            .multiple_occurrences(true)
+            .action(clap::ArgAction::Count)
             .help("Level of verbosity (error is default) if used multiple times: warn(v), info(vv), debug(vvv) and trace(vvvv)"));
 
     commands

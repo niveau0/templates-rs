@@ -1,5 +1,5 @@
 use crate::{cfg::Settings, Shared};
-{%- if async != "none" %}
+{%- if runtime != "none" %}
 use async_trait::async_trait;
 {%- endif %}
 use thiserror::Error;
@@ -10,7 +10,7 @@ pub enum CommandError {
     Command(String),
 }
 
-{%- if async != "none" %}
+{%- if runtime != "none" %}
 #[async_trait]
 pub trait Command {
     async fn execute_on_match(
@@ -23,5 +23,5 @@ pub trait Command {
         args: &clap::ArgMatches,
     ) -> Option<Result<(), CommandError>>;
     
-    fn configuration(&self) -> clap::Command<'static>;
+    fn configuration(&self) -> clap::Command;
 }

@@ -9,13 +9,8 @@ prompt = "What license to use?"
 choices = ["MIT", "Apache license 2.0"]
 default = "MIT"
 
-[placeholders.async]
+[placeholders.runtime]
 type = "string"
 prompt = "Use async runtime?"
 choices = ["none", "tokio", "async_std"]
 default = "none"
-
-[placeholders.cmds]
-type = "bool"
-prompt = "Use commands as parameters?"
-default = false

@@ -17,15 +17,15 @@ pub struct Settings {
     pub example: String,
 }
 
-pub fn read_config(maybe_filename: &Option<&str>) -> Result<Settings, ConfigError> {
+pub fn read_config(maybe_filename: &Option<&String>) -> Result<Settings, ConfigError> {
     let settings = read_merged_config(maybe_filename).map_err(|_| ConfigError::ReadConfig)?;
-    let example = settings
-        .get_string("example")
-        .map_err(|_| ConfigError::ParseConfig("Missing key example".to_owned()))?;
+    let example = settings.get_string("example").map_err(|_| {
+        ConfigError::ParseConfig("Failed to get configuration for 'example'".to_owned())
+    })?;
     Ok(Settings { example })
 }
 
-pub fn read_merged_config(maybe_filename: &Option<&str>) -> Result<config::Config, ConfigError> {
+pub fn read_merged_config(maybe_filename: &Option<&String>) -> Result<config::Config, ConfigError> {
     let mut settings = config::Config::builder();
 
     settings = settings.add_source(File::new("conf/defaults", FileFormat::Yaml));

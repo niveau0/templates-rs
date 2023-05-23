@@ -1,5 +1,5 @@
 extern crate log;
-{% if async == "none" %}
+{% if runtime == "none" %}
 fn main() {
     let result = {{crate_name}}::run();
 
@@ -8,7 +8,7 @@ fn main() {
     }
 }
 {%- endif %}
-{%- if async == "tokio" %}
+{%- if runtime == "tokio" %}
 #[tokio::main]
 async fn main() {
     let result = {{crate_name}}::run().await;
@@ -18,7 +18,7 @@ async fn main() {
     }
 }
 {%- endif %}
-{%- if async == "async_std" %}
+{%- if runtime == "async_std" %}
 #[async_std::main]
 async fn main() {
     let result = {{crate_name}}::run().await;

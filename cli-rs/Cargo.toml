@@ -13,21 +13,21 @@ opt-level = 3
 opt-level = 1
 
 [dependencies]
-{%- if async != "none" %}
-async-trait = "0.1.68"
+{%- if runtime == "async_std" %}
+async-std = { version = "1.12", features = ["attributes"] } # async runtime
+{%- endif %}
+{%- if runtime != "none" %}
+async-trait = "0.1"
 {%- endif %}
 {%- if crate_type == "bin" %}
-clap = "3.1" # parse command line options
+clap = "4.3" # parse command line options
 {%- endif %}
-config = "0.12" # parse config file
-env_logger = "0.9" # log implementation
+config = "0.13" # parse config file
+env_logger = "0.10" # log implementation
 log = "0.4" # logging facade
-thiserror = "1" # error support
-{%- if async == "tokio" %}
-tokio = { version = "1", features = ["macros", "sync", "rt-multi-thread"] } # async runtime
-{%- endif %}
-{%- if async == "async_std" %}
-async-std = { version = "1", features = ["attributes"] } # async runtime
+thiserror = "1.0" # error support
+{%- if runtime == "tokio" %}
+tokio = { version = "1.28", features = ["macros", "sync", "rt-multi-thread"] } # async runtime
 {%- endif %}
 {% if crate_type == "bin" %}
 [[bin]]
