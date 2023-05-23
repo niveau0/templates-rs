@@ -8,7 +8,11 @@ To generate a project from a given template use cargo-generate. See command for 
 
 ## Existing templates
 
-* Command line interface parsing skeleton, using clap crate and a simple command pattern.
+* Command line interface parsing skeleton, using clap crate and providing command pattern.
+
+        cargo generate -g niveau0/templates-rs cli-rs
+
+* Web service skeleton, using clap crate and providing REST example.
 
         cargo generate -g niveau0/templates-rs cli-rs
 
@@ -18,6 +22,6 @@ To generate a project from a given template use cargo-generate. See command for 
 
 ## Planned
 
-* web service skeleton with a REST API
-    * optional WASM UI with tailwind css and trunk for bundling
-    * optional DB connection
+* optional WASM UI with tailwind css and trunk for bundling
+* optional DB connection
+^

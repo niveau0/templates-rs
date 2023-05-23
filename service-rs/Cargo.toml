@@ -1,0 +1,43 @@
+[package]
+name = "{{crate_name}}"
+version = "0.1.0"
+authors = ["{{authors}}"]
+edition = "2021"
+description = "{{project-name}}"
+license = "{{license}}"
+
+[profile.release]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+[dependencies]
+{%- if webframework == "actix" %}
+actix-web = "4.3"
+{%- endif %}
+{%- if runtime != "none" %}
+async-trait = "0.1"
+{%- endif %}
+{%- if webframework == "axum" %}
+axum = "0.6"
+{%- endif %}
+{%- if crate_type == "bin" %}
+clap = "4.3" # parse command line options
+{%- endif %}
+config = "0.13" # parse config file
+env_logger = "0.10" # log implementation
+log = "0.4" # logging facade
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0" # error support
+tokio = { version = "1.28", features = ["macros", "sync", "rt-multi-thread"] } # async runtime
+{%- if webframework == "axum" %}
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+{%- endif %}
+{% if crate_type == "bin" %}
+[[bin]]
+path = "src/main.rs"
+name = "{{crate_name}}"
+{% endif %}
